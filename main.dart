@@ -4,47 +4,44 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:location/location.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'dart:async';
+
+//import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
-
-
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget{
-  //final appTitle = 'Women\'s Helpline Center';
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    return MaterialApp(
-      title: 'Women\'s Safety Centre',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.pink,
-      ),
-      home: MyHomePage(title: 'Movies'),
+    return StreamBuilder(
+    stream: bloc.darkThemeEnabled,
+    initialData: false,
+    builder: (context, snapshot) => MaterialApp(
+        theme: snapshot.data ? ThemeData.dark() : ThemeData.light(),
+        home: MyHomePage("Women's Safety App (New)", snapshot.data)),
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
   final String title;
-  MyHomePage({Key key, this.title}) : super(key: key);
+  final bool darkThemeEnabled;
+
+  MyHomePage(this.title, this.darkThemeEnabled);
+
   @override
   Widget build(BuildContext context) {
     int currentIndex;
     Widget image_slider_carousel = Container(
       height: 300,
-
       child: Carousel(
         boxFit: BoxFit.fill,
-        images:[
+        images: [
           AssetImage('images/movie1.jpg'),
           AssetImage('images/movie2.jpg'),
           AssetImage('images/movie3.jpg'),
           AssetImage('images/movie4.jpg'),
-
         ],
         autoplay: true,
         indicatorBgPadding: 1.0,
@@ -55,17 +52,17 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
-
         ),
-
-        body:
-        ListView(
+        body: ListView(
           children: <Widget>[
             image_slider_carousel,
             ListTile(
               title: Text('\CONTACTS\n\n\n'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Contacts()),);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Contacts()),
+                );
               },
             ),
 
@@ -76,39 +73,45 @@ class MyHomePage extends StatelessWidget {
               },
             ),*/
           ],
-
         ),
-
         drawer: Drawer(
-
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
               DrawerHeader(
-
-                child: Text('\nMovies ',
+                child: Text(
+                  '\nMovies ',
                   style: TextStyle(fontSize: 25, fontFamily: 'Montserrat'),
-
                 ),
-
-
                 decoration: BoxDecoration(
                   color: Colors.pink,
-
                 ),
               ),
               ListTile(
                 title: Text('Register'),
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationPage()),);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistrationPage()),
+                  );
                 },
               ),
               ListTile(
                 title: Text('Login'),
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()),);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
                 },
               ),
+              ListTile(
+                title: Text("Dark Theme"),
+                trailing: Switch(
+                  value: darkThemeEnabled,
+                  onChanged: bloc.changeTheme,
+                ),
+              )
               /*ListTile(
                 title: Text('Emergency SOS'),
                 onTap: (){
@@ -132,11 +135,9 @@ class MyHomePage extends StatelessWidget {
             BottomNavigationBarItem(
               icon: new Icon(Icons.person),
               title: new Text('Profile'),
-
             )
           ],
-        )
-    );
+        ));
   }
 }
 
@@ -148,6 +149,7 @@ class RegistrationPage extends StatelessWidget {
     );
   }
 }
+
 class RegistrationForm extends StatefulWidget {
   @override
   RegistrationFormState createState() {
@@ -163,74 +165,223 @@ class RegistrationFormState extends State<RegistrationForm> {
     return new Scaffold(
         resizeToAvoidBottomPadding: false,
         body: SingleChildScrollView(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                Widget>[
-              Container(
-
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.fromLTRB(15.0, 110.0, 0.0, 0.0),
-                      child: Text(
-                        'Signup',
-                        style:
-                        TextStyle(fontSize: 80.0, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(260.0, 125.0, 0.0, 0.0),
-                      child: Text(
-                        '.',
-                        style: TextStyle(
-                            fontSize: 80.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.pink),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                  padding: EdgeInsets.only(top: 35.0, left: 20.0, right: 20.0),
-                  child: Column(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: Stack(
                     children: <Widget>[
-                      TextField(
-                        decoration: InputDecoration(
-                            labelText: 'EMAIL',
-                            labelStyle: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey),
-                            // hintText: 'EMAIL',
-                            // hintStyle: ,
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.pink))),
-                      ),
-                      SizedBox(height: 10.0),
-                      TextField(
-                        decoration: InputDecoration(
-                            labelText: 'PASSWORD ',
-                            labelStyle: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey),
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.pink))),
-                        obscureText: true,
-                      ),
-                      SizedBox(height: 10.0),
-                      TextField(
-                        decoration: InputDecoration(
-                            labelText: 'FULL NAME ',
-                            labelStyle: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey),
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.pink))),
-                      ),
-                      SizedBox(height: 50.0),
                       Container(
+                        padding: EdgeInsets.fromLTRB(15.0, 110.0, 0.0, 0.0),
+                        child: Text(
+                          'Signup',
+                          style: TextStyle(
+                              fontSize: 80.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(260.0, 125.0, 0.0, 0.0),
+                        child: Text(
+                          '.',
+                          style: TextStyle(
+                              fontSize: 80.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                    padding:
+                    EdgeInsets.only(top: 35.0, left: 20.0, right: 20.0),
+                    child: Column(
+                      children: <Widget>[
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: 'EMAIL',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              // hintText: 'EMAIL',
+                              // hintStyle: ,
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.pink))),
+                        ),
+                        SizedBox(height: 10.0),
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: 'PASSWORD ',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.pink))),
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 10.0),
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: 'FULL NAME ',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.pink))),
+                        ),
+                        SizedBox(height: 50.0),
+                        Container(
+                            height: 40.0,
+                            child: Material(
+                              borderRadius: BorderRadius.circular(20.0),
+                              shadowColor: Colors.pinkAccent,
+                              color: Colors.pink,
+                              elevation: 7.0,
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: Center(
+                                  child: Text(
+                                    'SIGNUP',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Montserrat'),
+                                  ),
+                                ),
+                              ),
+                            )),
+                        SizedBox(height: 20.0),
+                        Container(
+                          height: 40.0,
+                          color: Colors.transparent,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.black,
+                                    style: BorderStyle.solid,
+                                    width: 1.0),
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(20.0)),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Center(
+                                child: Text('Go Back',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Montserrat')),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+              ]),
+        ));
+  }
+}
+
+class LoginPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: LoginForm(),
+    );
+  }
+}
+
+class LoginForm extends StatefulWidget {
+  @override
+  LoginFormState createState() {
+    return LoginFormState();
+  }
+}
+
+class LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        resizeToAvoidBottomPadding: false,
+        body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.fromLTRB(15.0, 110.0, 0.0, 0.0),
+                        child: Text('Hello',
+                            style: TextStyle(
+                                fontSize: 80.0, fontWeight: FontWeight.bold)),
+                      ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(16.0, 175.0, 0.0, 0.0),
+                        child: Text('There',
+                            style: TextStyle(
+                                fontSize: 80.0, fontWeight: FontWeight.bold)),
+                      ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(222.0, 175.0, 0.0, 0.0),
+                        child: Text('!',
+                            style: TextStyle(
+                                fontSize: 80.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.pink)),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                    padding: EdgeInsets.only(
+                        top: 35.0, left: 20.0, right: 20.0),
+                    child: Column(
+                      children: <Widget>[
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: 'EMAIL',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.pink))),
+                        ),
+                        SizedBox(height: 20.0),
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: 'PASSWORD',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.pink))),
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 5.0),
+                        Container(
+                          alignment: Alignment(1.0, 0.0),
+                          padding: EdgeInsets.only(top: 15.0, left: 20.0),
+                          child: InkWell(
+                            child: Text(
+                              'Forgot Password',
+                              style: TextStyle(
+                                  color: Colors.pink,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Montserrat',
+                                  decoration: TextDecoration.underline),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 40.0),
+                        Container(
                           height: 40.0,
                           child: Material(
                             borderRadius: BorderRadius.circular(20.0),
@@ -241,7 +392,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                               onTap: () {},
                               child: Center(
                                 child: Text(
-                                  'SIGNUP',
+                                  'LOGIN',
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -249,218 +400,70 @@ class RegistrationFormState extends State<RegistrationForm> {
                                 ),
                               ),
                             ),
-                          )),
-                      SizedBox(height: 20.0),
-                      Container(
-                        height: 40.0,
-                        color: Colors.transparent,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.black,
-                                  style: BorderStyle.solid,
-                                  width: 1.0),
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20.0)),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child:
-
-                            Center(
-                              child: Text('Go Back',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Montserrat')),
-                            ),
-
-
                           ),
                         ),
-                      ),
-                    ],
-                  )),
-
-            ]),
-        )
-       
-    );
-  }
-}
-class LoginPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: LoginForm(),
-    );
-  }
-}
-class LoginForm extends StatefulWidget {
-  @override
-  LoginFormState createState() {
-    return LoginFormState();
-  }
-}
-class LoginFormState extends State<LoginForm> {
-
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        resizeToAvoidBottomPadding: false,
-        body: SingleChildScrollView(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.fromLTRB(15.0, 110.0, 0.0, 0.0),
-                    child: Text('Hello',
-                        style: TextStyle(
-                            fontSize: 80.0, fontWeight: FontWeight.bold)),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(16.0, 175.0, 0.0, 0.0),
-                    child: Text('There',
-                        style: TextStyle(
-                            fontSize: 80.0, fontWeight: FontWeight.bold)),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(222.0, 175.0, 0.0, 0.0),
-                    child: Text('!',
-                        style: TextStyle(
-                            fontSize: 80.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.pink)),
-                  )
-                ],
-              ),
-            ),
-            Container(
-                padding: EdgeInsets.only(top: 35.0, left: 20.0, right: 20.0),
-                child: Column(
+                        SizedBox(height: 20.0),
+                        Container(
+                          height: 40.0,
+                          color: Colors.transparent,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.black,
+                                    style: BorderStyle.solid,
+                                    width: 1.0),
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(20.0)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Center(
+                                  child:
+                                  ImageIcon(AssetImage('assets/facebook.png')),
+                                ),
+                                SizedBox(width: 10.0),
+                                Center(
+                                  child: Text('Log in with Google',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Montserrat')),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
+                SizedBox(height: 15.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    TextField(
-                      decoration: InputDecoration(
-                          labelText: 'EMAIL',
-                          labelStyle: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.pink))),
+                    Text(
+                      'First Time Here?',
+                      style: TextStyle(fontFamily: 'Montserrat'),
                     ),
-                    SizedBox(height: 20.0),
-                    TextField(
-                      decoration: InputDecoration(
-                          labelText: 'PASSWORD',
-                          labelStyle: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.pink))),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 5.0),
-                    Container(
-                      alignment: Alignment(1.0, 0.0),
-                      padding: EdgeInsets.only(top: 15.0, left: 20.0),
-                      child: InkWell(
-                        child: Text(
-                          'Forgot Password',
-                          style: TextStyle(
-                              color: Colors.pink,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Montserrat',
-                              decoration: TextDecoration.underline),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40.0),
-                    Container(
-                      height: 40.0,
-                      child: Material(
-                        borderRadius: BorderRadius.circular(20.0),
-                        shadowColor: Colors.pinkAccent,
-                        color: Colors.pink,
-                        elevation: 7.0,
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Center(
-                            child: Text(
-                              'LOGIN',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Montserrat'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Container(
-                      height: 40.0,
-                      color: Colors.transparent,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.black,
-                                style: BorderStyle.solid,
-                                width: 1.0),
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(20.0)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Center(
-                              child:
-                              ImageIcon(AssetImage('assets/facebook.png')),
-                            ),
-                            SizedBox(width: 10.0),
-                            Center(
-                              child: Text('Log in with Google',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Montserrat')),
-                            )
-                          ],
-                        ),
+                    SizedBox(width: 5.0),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RegistrationPage()),
+                        );
+                      },
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                            color: Colors.pink,
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline),
                       ),
                     )
                   ],
-                )),
-            SizedBox(height: 15.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'First Time Here?',
-                  style: TextStyle(fontFamily: 'Montserrat'),
-                ),
-                SizedBox(width: 5.0),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationPage()),);
-                  },
-                  child: Text(
-                    'Register',
-                    style: TextStyle(
-                        color: Colors.pink,
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline),
-                  ),
                 )
               ],
-            )
-          ],
-        ))
-        );
+            )));
   }
 }
 
@@ -567,13 +570,13 @@ class _ListenPageState extends State<ListenPage> {
 class Contacts extends StatefulWidget {
   @override
   _ContactsState createState() => _ContactsState();
-
 }
 
 class _ContactsState extends State<Contacts> {
   static const url = "tel:1091";
+
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Emergency Contacts"),
@@ -596,3 +599,11 @@ class _ContactsState extends State<Contacts> {
     );
   }
 }
+
+class Bloc {
+  final _themeController = StreamController<bool>();
+  get changeTheme => _themeController.sink.add;
+  get darkThemeEnabled => _themeController.stream;
+}
+
+final bloc = Bloc();
